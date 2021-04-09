@@ -1,0 +1,23 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script src="node_modules/socket.io/client-dist/socket.io.js"></script>
+    <script>
+        var socket = io('http://localhost:5000');
+        socket.on('image', data => {
+            console.log("img dat", data);
+            const imgSrc = document.getElementById('image');
+            imgSrc.src = `data:image/jpeg;base64,${data}`
+        });
+    </script>
+
+</body>
+
+</html>

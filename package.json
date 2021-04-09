@@ -1,0 +1,32 @@
+{
+    "name": "behave",
+    "version": "1.0.0",
+    "description": "",
+    "main": "app.js",
+    "repository": {
+        "type": "git",
+        "url": ""
+    },
+    "dependencies": {
+        "@tensorflow/tfjs-node": "^3.3.0",
+        "express": "^4.17.1",
+        "jimp": "^0.16.1",
+        "nodemon": "^2.0.7",
+        "opencv4nodejs": "^5.6.0",
+        "socket.io": "^4.0.1"
+    },
+    "devDependencies": {},
+    "opencv4nodejs": {
+        "disableAutoBuild": 1,
+        "opencvIncludeDir": "C:\\Users\\shash\\DEV\\opencv\\build\\include",
+        "opencvLibDir": "C:\\Users\\shash\\DEV\\opencv\\build\\x64\\vc15\\lib",
+        "opencvBinDir": "C:\\Users\\shash\\DEV\\opencv\\build\\x64\\vc15\\bin"
+    },
+    "scripts": {
+        "dev": "nodemon server.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}
