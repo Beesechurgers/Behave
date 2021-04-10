@@ -30,26 +30,29 @@ tf.loadLayersModel(`file://${__dirname}/model_tf/model.json`).then(m => {
     console.log("Model was loaded");
     model = m;
 });
-const FPS = 24;
+const FPS = 60;
 
 app.use(express.static('.'));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '\\index.html'))
 });
 
+let vw = null;
 io.on('connection', (socket) => {
     console.log("Connected");
     socket.on('rec', (start) => {
         START_DETECTION = start;
         if (start) {
+            vw = new cv.VideoWriter("video.mp4", -1, 10, new cv.Size(1280, 720), true);
             startCamera();
         } else {
+            vw.release();
             stopCamera();
         }
     })
 });
 
-var emotion = "NA";
+var emotion = "NA", fps = 0;
 var gray = null, faces = null, values = new Float32Array(1), area = null, bitImg = null,
     pred = null;
 let tfImage = null;
@@ -94,9 +97,20 @@ setInterval(() => {
         }
         frame.putText(emotion, new cv.Point2(ex.x, ex.y), cv.FONT_HERSHEY_SIMPLEX, 1, new cv.Vec3(0, 0, 255), 2);
     }
+    vw.set(cv.CAP_PROP_FPS, fps + 2);
+    vw.write(frame);
     const img = cv.imencode('.jpg', frame).toString('base64');
+    fps++;
     io.emit('image', img);
 }, 1000 / FPS);
+
+setInterval(() => {
+    if (!START_DETECTION) {
+        return;
+    }
+    console.log('FPS', fps);
+    fps = 0;
+}, 1000);
 
 server.listen(5000, () => {
     console.log('Listening on 5000');
