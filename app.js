@@ -13,6 +13,8 @@
  */
 
 const cv = require('opencv4nodejs');
+const tf = require('@tensorflow/tfjs-node');
+const jimp = require('jimp');
 const path = require('path');
 const express = require('express');
 const app = express();
@@ -24,6 +26,11 @@ camera.set(cv.CAP_PROP_FRAME_WIDTH, 600);
 camera.set(cv.CAP_PROP_FRAME_HEIGHT, 400);
 
 const cascade = new cv.CascadeClassifier('haarcascade_frontalface_default.xml');
+let model = null;
+tf.loadLayersModel(`file://${__dirname}/model_tf/model.json`).then(m => {
+    console.log("Model was loaded");
+    model = m;
+});
 const FPS = 24;
 
 app.use(express.static('.'));
@@ -33,11 +40,13 @@ app.get('/', (req, res) => {
 
 io.on('connection', socket => {
     console.log("Connected");
-    socket.on('image', (data) => {
-        console.log(data);
-    });
 });
 
+var emotion = "NA";
+var gray = null, faces = null, values = new Float32Array(1), area = null, bitImg = null,
+    pred = null;
+let tfImage = null;
+const emots = ["angry", 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
 setInterval(() => {
     var frame = camera.read().flip(1);
     gray = frame.cvtColor(cv.COLOR_BGR2GRAY);
@@ -45,6 +54,35 @@ setInterval(() => {
     for (let i = 0; i < faces.numDetections.length; i++) {
         const ex = faces.objects[i];
         frame.drawRectangle(new cv.Point2(ex.x, ex.y), new cv.Point2(ex.x + ex.width, ex.y + ex.height), new cv.Vec3(0, 255, 0), 2);
+
+        area = frame.resize(48, 48);
+        if (model != null) {
+            (async () => {
+                values = new Float32Array(48 * 48);
+                bitImg = await jimp.create(cv.imencode('.jpg', area));
+
+                let i = 0;
+                bitImg.scan(0, 0, bitImg.bitmap.width, bitImg.bitmap.height, (x, y, idx) => {
+                    const pixel = jimp.intToRGBA(bitImg.getPixelColor(x, y));
+                    pixel.r = pixel.r / 127.0 - 1;
+                    pixel.g = pixel.g / 127.0 - 1;
+                    pixel.b = pixel.b / 127.0 - 1;
+                    pixel.a = pixel.a / 127.0 - 1;
+                    values[i + 0] = pixel.r;
+                    values[i + 1] = pixel.g;
+                    values[i * 2] = pixel.b;
+                    i++;
+                });
+
+                const outShape = [48, 48, 1];
+                tfImage = tf.tensor3d(values, outShape, 'float32');
+                tfImage = tfImage.expandDims(0);
+
+                pred = model.predict(tfImage).dataSync();
+                emotion = emots[getMaxIndex(pred)];
+            })();
+        }
+        frame.putText(emotion, new cv.Point2(ex.x, ex.y), cv.FONT_HERSHEY_SIMPLEX, 1, new cv.Vec3(0, 0, 255), 2);
     }
     const img = cv.imencode('.jpg', frame).toString('base64');
     io.emit('image', img);
@@ -53,3 +91,14 @@ setInterval(() => {
 server.listen(5000, () => {
     console.log('Listening on 5000');
 });
+
+function getMaxIndex(predArr) {
+    let max = 0.0, idx = 0;
+    for (let i = 0; i < predArr.length; i++) {
+        if (predArr[i] > max) {
+            max = predArr[i];
+            idx = i;
+        }
+    }
+    return idx;
+}
