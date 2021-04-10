@@ -37,6 +37,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '\\index.html'))
 });
 
+app.get('/download', (req, res) => {
+    res.download('video.mp4', 'video.mp4', (err) => {
+        require('fs').unlinkSync('video.mp4');
+        if (err) console.log("Err: ", err);
+    });
+});
+
 let vw = null;
 io.on('connection', (socket) => {
     console.log("Connected");
@@ -47,9 +54,14 @@ io.on('connection', (socket) => {
             startCamera();
         } else {
             vw.release();
+            vw = null;
             stopCamera();
         }
     })
+
+    socket.on('dn', (_) => {
+        io.emit('dn-ret', vw == null && require('fs').existsSync('video.mp4'));
+    });
 });
 
 var emotion = "NA", fps = 0;

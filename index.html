@@ -73,7 +73,8 @@
                                 <h4><i class="fa fa-video-camera"></i>Start</h4>
                             </div>
                             <div class="content-hide">
-                                <p></p>
+                                <p>Click below to start tracking the behavior. <br>
+                                    Starting recording again before downloading will override the previous recording. </p>
                                 <div class="scroll-to-section"><a href="">
                                         <p id="start_rec" onclick="handleStartRec(true)">Start Recording</p>
                                     </a></div>
@@ -88,8 +89,8 @@
                                 <h4><i class="fa fa-stop"></i>Stop</h4>
                             </div>
                             <div class="content-hide">
-                                <p></p>
-                                <div class="scroll-to-section"><a href="" onclick="handleStartRec(false)">Stop</a></div>
+                                <p>Stop recording before downloading the video.</p>
+                                <div class="scroll-to-section"><a href="" onclick="handleStartRec(false)">Stop Recording</a></div>
                             </div>
                         </div>
                     </div>
@@ -101,8 +102,8 @@
                                 <h4><i class="fa fa-download"></i>Download</h4>
                             </div>
                             <div class="content-hide">
-                                <p></p>
-                                <div class="scroll-to-section"><a href="#section4">Read More</a></div>
+                                <p>Click below to download the recorded video.</p>
+                                <div class="scroll-to-section"><a href="" onclick="startDownload()">Download Recording</a></div>
                             </div>
                         </div>
                     </div>
@@ -203,6 +204,11 @@
             const imgSrc = document.getElementById('bg-video');
             imgSrc.src = `data:image/jpeg;base64,${data}`
         });
+        socket.on('dn-ret', (allow) => {
+            if (allow) {
+                window.open('/download');
+            }
+        })
 
         function handleStartRec(start) {
             socket.emit('rec', start);
@@ -213,6 +219,10 @@
                 document.getElementById('bg-video').style.visibility = 'hidden'
                 document.getElementById('main-cap').style.visibility = 'visible'
             }
+        }
+
+        function startDownload() {
+            socket.emit('dn', 'start');
         }
     </script>
     <script>
