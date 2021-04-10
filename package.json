@@ -10,6 +10,7 @@
     "dependencies": {
         "@tensorflow/tfjs-node": "^3.3.0",
         "express": "^4.17.1",
+        "gif-encoder": "^0.7.2",
         "jimp": "^0.16.1",
         "nodemon": "^2.0.7",
         "opencv4nodejs": "^5.6.0",

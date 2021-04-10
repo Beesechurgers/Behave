@@ -21,9 +21,8 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-const camera = new cv.VideoCapture(0);
-camera.set(cv.CAP_PROP_FRAME_WIDTH, 600);
-camera.set(cv.CAP_PROP_FRAME_HEIGHT, 400);
+var START_DETECTION = false;
+var camera = null;
 
 const cascade = new cv.CascadeClassifier('haarcascade_frontalface_default.xml');
 let model = null;
@@ -38,8 +37,16 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '\\index.html'))
 });
 
-io.on('connection', socket => {
+io.on('connection', (socket) => {
     console.log("Connected");
+    socket.on('rec', (start) => {
+        START_DETECTION = start;
+        if (start) {
+            startCamera();
+        } else {
+            stopCamera();
+        }
+    })
 });
 
 var emotion = "NA";
@@ -48,6 +55,9 @@ var gray = null, faces = null, values = new Float32Array(1), area = null, bitImg
 let tfImage = null;
 const emots = ["angry", 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral'];
 setInterval(() => {
+    if (!START_DETECTION) {
+        return
+    }
     var frame = camera.read().flip(1);
     gray = frame.cvtColor(cv.COLOR_BGR2GRAY);
     faces = cascade.detectMultiScale(gray, 1.3, 5);
@@ -55,9 +65,9 @@ setInterval(() => {
         const ex = faces.objects[i];
         frame.drawRectangle(new cv.Point2(ex.x, ex.y), new cv.Point2(ex.x + ex.width, ex.y + ex.height), new cv.Vec3(0, 255, 0), 2);
 
-        area = frame.resize(48, 48);
         if (model != null) {
             (async () => {
+                area = frame.resize(48, 48);
                 values = new Float32Array(48 * 48);
                 bitImg = await jimp.create(cv.imencode('.jpg', area));
 
@@ -70,7 +80,7 @@ setInterval(() => {
                     pixel.a = pixel.a / 127.0 - 1;
                     values[i + 0] = pixel.r;
                     values[i + 1] = pixel.g;
-                    values[i * 2] = pixel.b;
+                    values[i + 2] = pixel.b;
                     i++;
                 });
 
@@ -91,6 +101,21 @@ setInterval(() => {
 server.listen(5000, () => {
     console.log('Listening on 5000');
 });
+
+function startCamera() {
+    if (camera == null) {
+        camera = new cv.VideoCapture(0);
+        camera.set(cv.CAP_PROP_FRAME_WIDTH, 1280);
+        camera.set(cv.CAP_PROP_FRAME_HEIGHT, 720);
+    }
+}
+
+function stopCamera() {
+    if (camera != null) {
+        camera.release();
+        camera = null;
+    }
+}
 
 function getMaxIndex(predArr) {
     let max = 0.0, idx = 0;
