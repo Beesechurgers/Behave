@@ -14,6 +14,16 @@ This software will help teachers to understand their students in a modern and be
 
 This will act as a bridge filling the communication gap between students and teachers. Teachers can get feedback of their class and see the students' behavior in front of them or behind their back. This will also tell the teachers which students actively participate in the classes.
 
+## Testing Live
+- Clone this repo and `cd` to it.
+- Install node js on windows or linux
+- Install dependencies through `npm i @tensorflow/tfjs-node express jimp socket.io`
+- For installing OpenCV, get it's library from <a href="https://opencv.org/releases/">here</a> and extract it.
+- Edit `package.json` for updating the paths for OpenCV
+- Install the `opencv4nodejs` using `npm i opencv4nodejs`
+- Now run `node app.js` and open `localhost:5000` on browser
+    
+
 ## Demo Video Link:
   <a href="https://drive.google.com/file/d/1gBdWRj-244RZzMlotcu-6E6a9iZJTjGD/view">Demo Video</a>
   
