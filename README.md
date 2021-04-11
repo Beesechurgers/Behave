@@ -14,6 +14,12 @@ This software will help teachers to understand their students in a modern and be
 
 This will act as a bridge filling the communication gap between students and teachers. Teachers can get feedback of their class and see the students' behavior in front of them or behind their back. This will also tell the teachers which students actively participate in the classes.
 
+## Demo Video Link:
+  <a href="https://drive.google.com/file/d/1gBdWRj-244RZzMlotcu-6E6a9iZJTjGD/view">Demo Video</a>
+  
+## Presentation Link:
+  <a href="https://drive.google.com/file/d/1Gb5JDr4Pv12-vQLhnqI49e_tMFgNXD4O/view?usp=sharing">PPT Link</a>
+
 ## Technology Stack:
   1) Node.JS
   2) Tensorflow
