@@ -56,8 +56,8 @@
         <img id="bg-video">
         <div class="video-overlay header-text">
             <div class="caption" id="main-cap">
-                <h6>Monitor Behavior of</h6>
-                <h2><em>Your</em> Students</h2>
+                <h6 id="small-t">Monitor Behavior of</h6>
+                <h2 id="big-t"><em>Your</em> Students</h2>
             </div>
         </div>
     </section>
@@ -200,10 +200,31 @@
     <script src="node_modules/socket.io/client-dist/socket.io.js"></script>
     <script>
         var socket = io('http://localhost:5000');
-        socket.on('image', data => {
+        socket.on('image', (data, w, h) => {
             const imgSrc = document.getElementById('bg-video');
             imgSrc.src = `data:image/jpeg;base64,${data}`
+            imgSrc.style.minWidth = `${w}px`;
+            imgSrc.style.maxWidth = `${w}px`;
+            imgSrc.style.minHeight = `${h}px`;
+            imgSrc.style.maxHeight = `${h}px`;
         });
+        socket.on('test-done', (_) => {
+            document.getElementById('small-t').innerHTML = "Monitor Behavior of"
+            document.getElementById('small-t').style.visibility = 'hidden'
+        })
+        socket.on('fix-img', () => {
+            const imgSrc = document.getElementById('bg-video');
+            imgSrc.src = `//:0`;
+            imgSrc.style.visibility = 'hidden'
+            imgSrc.style.minWidth = `60%`;
+            imgSrc.style.maxWidth = `60%`;
+            imgSrc.style.minHeight = `60vh`;
+            imgSrc.style.maxHeight = `60vh`;
+
+            document.getElementById('small-t').innerHTML = "Monitor Behavior of"
+            document.getElementById('big-t').style.visibility = 'visible'
+            document.getElementById('small-t').style.visibility = 'visible'
+        })
         socket.on('dn-ret', (allow) => {
             if (allow) {
                 window.open('/download');
@@ -214,10 +235,8 @@
             socket.emit('rec', start);
             if (start) {
                 document.getElementById('bg-video').style.visibility = 'visible'
-                document.getElementById('main-cap').style.visibility = 'hidden'
-            } else {
-                document.getElementById('bg-video').style.visibility = 'hidden'
-                document.getElementById('main-cap').style.visibility = 'visible'
+                document.getElementById('small-t').innerHTML = "Please wait 5 sec... Testing render frames"
+                document.getElementById('big-t').style.visibility = 'hidden'
             }
         }
 
