@@ -15,6 +15,7 @@
 const cv = require('opencv4nodejs');
 const tf = require('@tensorflow/tfjs-node');
 const jimp = require('jimp');
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const app = express();
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
 
 app.get('/download', (req, res) => {
     res.download('video.mp4', 'video.mp4', (err) => {
-        require('fs').unlinkSync('video.mp4');
+        fs.unlinkSync('video.mp4');
         if (err) console.log("Err: ", err);
     });
 });
@@ -60,8 +61,15 @@ io.on('connection', (socket) => {
     })
 
     socket.on('dn', (_) => {
-        io.emit('dn-ret', vw == null && require('fs').existsSync('video.mp4'));
+        io.emit('dn-ret', vw == null && fs.existsSync('video.mp4'));
     });
+
+    socket.on('disconnect', (_) => {
+        console.log("Disconnected");
+        if (fs.existsSync('video.mp4')) {
+            fs.unlinkSync('video.mp4');
+        }
+    })
 });
 
 var emotion = "NA", fps = 0;
