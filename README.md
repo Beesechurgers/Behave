@@ -1,8 +1,10 @@
-<h1 align="center">Behave</h1>
+<h1>Behave</h1>
 <p align="center">
 </p>
 
 <a href="https://hack36.com"> <img src="http://bit.ly/BuiltAtHack36" height=20px> </a>
+
+### <a href="https://devfolio.co/submissions/behave-e63c">Devfolio Project Link</a>
 
 
 ## Introduction:
