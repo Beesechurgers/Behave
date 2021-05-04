@@ -19,7 +19,7 @@ This will act as a bridge filling the communication gap between students and tea
 ## Testing Live
 - Clone this repo and `cd` to it.
 - Install node js on windows or linux
-- Install dependencies through `npm i @tensorflow/tfjs-node express jimp socket.io`
+- Install dependencies through `npm i @tensorflow/tfjs express jimp socket.io`
 - For installing OpenCV, get it's library from <a href="https://opencv.org/releases/">here</a> and extract it.
 - Edit `package.json` for updating the paths for OpenCV
 - Install the `opencv4nodejs` using `npm i opencv4nodejs`

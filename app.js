@@ -13,7 +13,7 @@
  */
 
 const cv = require('opencv4nodejs');
-const tf = require('@tensorflow/tfjs-node');
+const tf = require('@tensorflow/tfjs');
 const jimp = require('jimp');
 const fs = require('fs');
 const path = require('path');
